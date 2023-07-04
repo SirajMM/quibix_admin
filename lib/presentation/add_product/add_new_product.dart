@@ -1,9 +1,10 @@
-import 'dart:io';
+import 'package:admin/domain/functions/db_functions.dart';
+import 'package:admin/domain/models/product_models.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../application/add_product_provider/add_product_provider.dart';
-import '../../../constants/constants.dart';
-import '../../widgets/textfield_widget.dart';
+import '../../application/add_product_provider/add_product_provider.dart';
+import '../../constants/constants.dart';
+import '../widgets/textfield_widget.dart';
 
 class AddNewProductScreen extends StatelessWidget {
   const AddNewProductScreen({super.key});
@@ -40,7 +41,7 @@ class AddNewProductScreen extends StatelessWidget {
                     onTap: () {
                       // value.pickImage();
                       Provider.of<AddProductProvider>(context, listen: false)
-                          .pickImage();
+                          .pickImage(context);
                     },
                     child: SizedBox(
                       width: size.width * 0.7,
@@ -68,8 +69,8 @@ class AddNewProductScreen extends StatelessWidget {
                           : ListView.builder(
                               scrollDirection: Axis.horizontal,
                               itemCount: value.imageModels.length,
-                              itemBuilder: (context, index) => Image.file(
-                                File(value.imageModels[index]),
+                              itemBuilder: (context, index) => Image.network(
+                                value.imageModels[index],
                                 fit: BoxFit.contain,
                                 width: size.width * 0.7,
                                 height: size.width * 0.7,
@@ -125,7 +126,34 @@ class AddNewProductScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(bottom: 15),
               child: TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  addProduct(
+                          Products(
+                              productName: nameController.text,
+                              subname: subnameController.text,
+                              category: categoryController.text,
+                              quantity: quantityController.text,
+                              price: priceController.text,
+                              color: colorController.text,
+                              imageList: Provider.of<AddProductProvider>(
+                                      context,
+                                      listen: false)
+                                  .imageModels,
+                              description: descriptionController.text),
+                          context)
+                      .then((value) {
+                    nameController.clear();
+                    subnameController.clear();
+                    categoryController.clear();
+                    quantityController.clear();
+                    priceController.clear();
+                    colorController.clear();
+                    descriptionController.clear();
+                    Provider.of<AddProductProvider>(context, listen: false)
+                        .imageModels
+                        .clear();
+                  });
+                },
                 style: ButtonStyle(
                   shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                     RoundedRectangleBorder(
@@ -140,7 +168,7 @@ class AddNewProductScreen extends StatelessWidget {
                           horizontal: size.width * 0.32, vertical: 20)),
                 ),
                 child: const Text(
-                  'Save',
+                  'Submit',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 20,
@@ -168,5 +196,3 @@ final TextEditingController priceController = TextEditingController();
 final TextEditingController colorController = TextEditingController();
 
 final TextEditingController descriptionController = TextEditingController();
-
-List<String> categoriesList = ["Men", "Women", "Children", "Others"];

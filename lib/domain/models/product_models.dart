@@ -2,8 +2,8 @@ class Products {
   final String productName;
   final String subname;
   final String category;
-  final int quantity;
-  final int price;
+  final String quantity;
+  final String price;
   final String color;
   final String description;
   final List? imageList;

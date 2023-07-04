@@ -4,7 +4,7 @@ import 'package:admin/presentation/home/widgets/order_tiles.dart';
 import 'package:admin/presentation/home/widgets/product_tiles.dart';
 import 'package:flutter/material.dart';
 import '../../constants/constants.dart';
-import 'widgets/add_new_product.dart';
+import '../add_product/add_new_product.dart';
 
 class ScreenHome extends StatelessWidget {
   const ScreenHome({super.key});
@@ -40,12 +40,7 @@ class ScreenHome extends StatelessWidget {
                       ),
                       GestureDetector(
                         onTap: () {
-                          // Navigator.pushAndRemoveUntil(context,
-                          //     MaterialPageRoute(
-                          //   builder: (context) {
-                          //     return const ScreenLogin();
-                          //   },
-                          // ), (route) => false);
+                     
                           Auth().signOut1();
                         },
                         child: const CircleAvatar(

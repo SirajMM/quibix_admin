@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
             create: (_) => AddProductProvider()),
       ],
       builder: (context, child) => MaterialApp(
-        title: 'Flutter Demo',
+        title: 'Quibix Admin',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: primaryBlack,

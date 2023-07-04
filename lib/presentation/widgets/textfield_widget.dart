@@ -17,7 +17,7 @@ class DetailsTextFieldWidget extends StatelessWidget {
   });
 
   final Size size;
-  final String fieldName;
+  final dynamic fieldName;
   final String? textString;
   final bool hideField;
   final bool numPad;

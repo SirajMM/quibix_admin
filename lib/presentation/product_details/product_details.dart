@@ -1,19 +1,25 @@
-import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
 import 'package:provider/provider.dart';
-import '../../../application/add_product_provider/add_product_provider.dart';
-import '../../../constants/constants.dart';
-import '../../widgets/textfield_widget.dart';
+import '../../application/add_product_provider/add_product_provider.dart';
+import '../../constants/constants.dart';
+import '../widgets/textfield_widget.dart';
 
 class ProductDetailsScreen extends StatelessWidget {
   const ProductDetailsScreen({
-    super.key,
-  });
+    Key? key,
+    required this.details,
+  }) : super(key: key);
+
+  final DocumentSnapshot details;
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final collection = FirebaseFirestore.instance.collection('products');
+    final reference = collection.doc(details.id);
+
     return Stack(
       children: [
         Scaffold(
@@ -21,11 +27,11 @@ class ProductDetailsScreen extends StatelessWidget {
           appBar: AppBar(
             backgroundColor: kMainBgColor,
             elevation: 0,
-            // automaticallyImplyLeading: true,
             foregroundColor: Colors.black,
             leading: IconButton(
-                onPressed: () => Navigator.pop(context),
-                icon: const Icon(Icons.arrow_back_ios_new)),
+              onPressed: () => Navigator.pop(context),
+              icon: const Icon(Icons.arrow_back_ios_new),
+            ),
             title: const Text(
               "Product Details",
               style: TextStyle(
@@ -37,41 +43,39 @@ class ProductDetailsScreen extends StatelessWidget {
           body: SingleChildScrollView(
             child: Column(
               children: [
-                ValueListenableBuilder(
+                ValueListenableBuilder<bool>(
                   valueListenable: editNotifier,
                   builder: (context, editOrUpdate, child) => Column(
                     children: [
                       Center(
-                        child: Consumer<AddProductProvider>(
-                            builder: (context, value, child) => value
-                                    .imageModels.isNotEmpty
-                                ? FlutterCarousel(
-                                    items: List.generate(
-                                        value.imageModels.length,
-                                        (index) => SizedBox(
-                                              width: size.width * 0.7,
-                                              child: Image.file(
-                                                File(value.imageModels[index]),
-                                              ),
-                                            )),
-                                    options: CarouselOptions(
-                                      indicatorMargin: 5,
-                                      viewportFraction: 1,
-                                      slideIndicator:
-                                          const CircularSlideIndicator(
-                                              indicatorRadius: 4,
-                                              itemSpacing: 15,
-                                              currentIndicatorColor:
-                                                  Colors.black,
-                                              indicatorBackgroundColor:
-                                                  Colors.grey),
-                                    ),
-                                  )
-                                : SizedBox(
-                                    height: size.width * 0.7,
+                        child: details['imageList'].isNotEmpty
+                            ? FlutterCarousel(
+                                items: List.generate(
+                                  details['imageList'].length,
+                                  (index) => SizedBox(
                                     width: size.width * 0.7,
-                                    child: const Center(
-                                        child: Text('Image not added')))),
+                                    child: Image.network(
+                                      details['imageList'][index],
+                                    ),
+                                  ),
+                                ),
+                                options: CarouselOptions(
+                                  indicatorMargin: 5,
+                                  viewportFraction: 1,
+                                  slideIndicator: const CircularSlideIndicator(
+                                    indicatorRadius: 4,
+                                    itemSpacing: 15,
+                                    currentIndicatorColor: Colors.black,
+                                    indicatorBackgroundColor: Colors.grey,
+                                  ),
+                                ),
+                              )
+                            : SizedBox(
+                                height: size.width * 0.7,
+                                width: size.width * 0.7,
+                                child: const Center(
+                                    child: Text('Image not added')),
+                              ),
                       ),
                       Visibility(
                         visible: !editOrUpdate,
@@ -85,7 +89,7 @@ class ProductDetailsScreen extends StatelessWidget {
                                 ? null
                                 : Provider.of<AddProductProvider>(context,
                                         listen: false)
-                                    .pickImage();
+                                    .pickImage(context);
                           },
                           label: const Text(
                             "Add Image",
@@ -103,58 +107,57 @@ class ProductDetailsScreen extends StatelessWidget {
                       DetailsTextFieldWidget(
                         size: size,
                         fieldName: "Product Name",
-                        textString: "name",
+                        textString: details['productname'],
                         textController: nameController,
                         enableTextField: !editOrUpdate,
-                        // enableTextField: false,
                       ),
                       DetailsTextFieldWidget(
                         size: size,
                         fieldName: "SubName",
                         enableTextField: !editOrUpdate,
-                        textString: "subname",
+                        textString: details["subname"],
                         textController: subnameController,
                       ),
                       DetailsTextFieldWidget(
                         size: size,
                         fieldName: "Category",
                         enableTextField: !editOrUpdate,
-                        textString: "category",
+                        textString: details["category"],
                         textController: categoryController,
                       ),
                       DetailsTextFieldWidget(
                         size: size,
                         fieldName: "Quantity",
                         enableTextField: !editOrUpdate,
-                        textString: "quantity",
+                        textString: details["quantity"],
                         textController: quantityController,
                       ),
                       DetailsTextFieldWidget(
                         size: size,
                         fieldName: "Price",
                         enableTextField: !editOrUpdate,
-                        textString: "price",
+                        textString: details["price"],
                         textController: priceController,
                       ),
                       DetailsTextFieldWidget(
                         size: size,
                         fieldName: "Color",
                         enableTextField: !editOrUpdate,
-                        textString: "color",
+                        textString: details["color"],
                         textController: colorController,
                       ),
                       DetailsTextFieldWidget(
                         size: size,
                         fieldName: "Description",
                         enableTextField: !editOrUpdate,
-                        textString: 'No Description Available Now',
+                        textString: details['description'],
                         textController: descriptionController,
                         height: 150,
                         maxLines: 2,
                       ),
                       SizedBox(
                         height: size.height * 0.1,
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -166,11 +169,27 @@ class ProductDetailsScreen extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 15),
           child: Align(
             alignment: Alignment.bottomCenter,
-            child: ValueListenableBuilder(
+            child: ValueListenableBuilder<bool>(
               valueListenable: editNotifier,
               builder: (context, editOrUpdate, child) => TextButton(
-                onPressed: () {
-                  editNotifier.value = !editNotifier.value;
+                onPressed: () async {
+                  if (editOrUpdate) {
+                    editNotifier.value = !editNotifier.value;
+                  } else {
+                    await reference.update({
+                      'productname': nameController.text,
+                      'subname': subnameController.text,
+                      'category': categoryController.text,
+                      'quantity': quantityController.text,
+                      'price': priceController.text,
+                      'color': colorController.text,
+                      'description': descriptionController.text,
+                      'imageList': Provider.of<AddProductProvider>(context,
+                              listen: false)
+                          .imageModels,
+                    }).then(
+                        (value) => editNotifier.value = !editNotifier.value);
+                  }
                 },
                 style: ButtonStyle(
                   shape: MaterialStateProperty.all<RoundedRectangleBorder>(
