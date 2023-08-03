@@ -1,5 +1,6 @@
 // ignore_for_file: unnecessary_null_comparison
 
+import 'package:admin/presentation/login_screen/reset_password/reset_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -101,15 +102,22 @@ class _ScreenLoginState extends State<ScreenLogin> {
                       comtroller: _paswordController,
                       validator: validatePassword),
                   constSizedBox10,
-                  const Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Text(
-                        'Forget Password?',
-                        style: TextStyle(
-                            color: AppConstantsColor.lightTextColor,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w200),
+                      GestureDetector(
+                        onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ResetScreen(),
+                            )),
+                        child: const Text(
+                          'Forget Password?',
+                          style: TextStyle(
+                              color: AppConstantsColor.lightTextColor,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w200),
+                        ),
                       )
                     ],
                   ),

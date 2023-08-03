@@ -1,13 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../constants/constants.dart';
+import '../../../constants/constants.dart';
 
 class ProductTile extends StatelessWidget {
   const ProductTile({
     Key? key,
+    required this.data,
   }) : super(key: key);
-
+  final Map<String, dynamic> data;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -19,9 +20,9 @@ class ProductTile extends StatelessWidget {
             height: 180,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(25),
-                image: const DecorationImage(
-                  image: AssetImage('assets/images/images.jpg'),
-                  fit: BoxFit.cover,
+                image: DecorationImage(
+                  image: NetworkImage(data['imageList'][0]),
+                  fit: BoxFit.contain,
                 )),
             child: Stack(
               children: [
@@ -41,7 +42,7 @@ class ProductTile extends StatelessWidget {
           ),
           khieght10,
           Text(
-            'Macbook Pro',
+            data['productname'],
             overflow: TextOverflow.ellipsis,
             maxLines: 1,
             style: GoogleFonts.roboto(
@@ -54,7 +55,8 @@ class ProductTile extends StatelessWidget {
           ),
           khieght5,
           Text(
-            '16 GB RAM 512 GB ROM',
+            data['subname'],
+            maxLines: 2,
             style: GoogleFonts.roboto(
               textStyle: const TextStyle(
                   letterSpacing: .5,
@@ -65,7 +67,7 @@ class ProductTile extends StatelessWidget {
           ),
           khieght5,
           Text(
-            "\$ 500",
+            '\$ ${data['price']}',
             style: GoogleFonts.roboto(
               textStyle: const TextStyle(
                   letterSpacing: .5,

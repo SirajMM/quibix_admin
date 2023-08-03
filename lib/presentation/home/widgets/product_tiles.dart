@@ -1,8 +1,8 @@
 import 'package:admin/constants/constants.dart';
 import 'package:admin/presentation/product_details/product_details.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
 
 class ProductsTiles extends StatelessWidget {
   const ProductsTiles({Key? key}) : super(key: key);
@@ -15,6 +15,7 @@ class ProductsTiles extends StatelessWidget {
         if (snapshot.hasData) {
           final data = snapshot.data!.docs;
           return ListView.separated(
+              physics: const BouncingScrollPhysics(),
               itemBuilder: (context, index) {
                 final DocumentSnapshot details = snapshot.data!.docs[index];
                 return GestureDetector(
@@ -28,28 +29,32 @@ class ProductsTiles extends StatelessWidget {
                         ));
                   },
                   child: Container(
+                    height: 100,
                     margin: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 10),
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
                       color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Container(
-                          height: 50,
-                          width: 50,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              image: DecorationImage(
-                                image: NetworkImage(
-                                  details['imageList'][0],
-                                ),
-                                fit: BoxFit.cover,
-                              )),
+                        CachedNetworkImage(
+                          height: 80,
+                          width: 80,
+                          filterQuality: FilterQuality.high,
+                          fit: BoxFit.contain,
+                          imageUrl: details['imageList'] == null ||
+                                  details['imageList'].length == 0
+                              ? ''
+                              : details['imageList'][0],
+                          placeholder: (context, url) =>
+                              Image.asset('assets/images/loadinganimation.gif'),
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.error),
                         ),
                         const SizedBox(
                           width: 10,
@@ -61,6 +66,8 @@ class ProductsTiles extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                               fontSize: 18,
                             ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
                           ),
                         ),
                         IconButton(
@@ -127,10 +134,3 @@ class ProductsTiles extends StatelessWidget {
 
 final CollectionReference products =
     FirebaseFirestore.instance.collection('products');
-// List<Map<String, String>> items = [
-//   {'name': 'Headphones', 'image': 'assets/images/headphones.jpg'},
-//   {'name': 'Tv', 'image': 'assets/images/gconnect1.jpg'},
-//   {'name': 'Watch', 'image': 'assets/images/image1.png'},
-//   {'name': 'Laptop', 'image': 'assets/images/images.jpg'},
-//   {'name': 'Phone', 'image': 'assets/images/08_Galaxy-S23-Ultra_Cream.webp'},
-// ];

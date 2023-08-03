@@ -1,7 +1,10 @@
-import 'package:admin/presentation/Search/product_tile.dart';
+import 'package:admin/application/search/serch_provide.dart';
+import 'package:admin/presentation/Search/widget/product_tile.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../constants/constants.dart';
-import 'custom_search.dart';
+import 'widget/custom_search.dart';
 
 class SearchScreen extends StatelessWidget {
   const SearchScreen({super.key});
@@ -19,28 +22,54 @@ class SearchScreen extends StatelessWidget {
         child: Column(
           children: [
             khieght10,
-            const CustomSearchWidget(
-              onChanged: filterUsers,
+            CustomSearchWidget(
+              onChanged: Provider.of<SearchProvider>(context, listen: true)
+                  .filterUsers,
             ),
             khieght10,
             Expanded(
-                child: GridView.builder(
-              shrinkWrap: true,
-              itemCount: 3,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: (itemWidth / itemHeight),
-                  crossAxisSpacing: 16.0,
-                  mainAxisSpacing: 16.0),
-              itemBuilder: (context, index) {
-                return const ProductTile();
-              },
-            ))
+                child: StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection('products')
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      return (snapshot.connectionState ==
+                              ConnectionState.waiting)
+                          ? const Center(
+                              child: CircularProgressIndicator(),
+                            )
+                          : Consumer<SearchProvider>(
+                              builder: (context, value, child) {
+                              return GridView.builder(
+                                shrinkWrap: true,
+                                itemCount: snapshot.data!.docs.length,
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 2,
+                                        childAspectRatio:
+                                            (itemWidth / itemHeight),
+                                        crossAxisSpacing: 16.0,
+                                        mainAxisSpacing: 16.0),
+                                itemBuilder: (context, index) {
+                                  var data = snapshot.data!.docs[index].data();
+                                  if (value.productName.isEmpty) {
+                                    return ProductTile(data: data);
+                                  }
+                                  if (data['productname']
+                                      .toString()
+                                      .toLowerCase()
+                                      .contains(
+                                          value.productName.toLowerCase())) {
+                                    return ProductTile(data: data);
+                                  }
+                                  return Container();
+                                },
+                              );
+                            });
+                    }))
           ],
         ),
       ),
     ));
   }
 }
-
-filterUsers(String query) {}

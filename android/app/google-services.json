@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "469326945631-igttnbaecdqergnntdi6cb12kjuq6p0i.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.apps.Quibix_admin",
+            "certificate_hash": "59cd15968051cf5663b0d55816771e81dbc8765b"
+          }
+        },
+        {
           "client_id": "469326945631-mktis72t2scsk9kbrmruuiokv8ujscdc.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -42,6 +50,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "469326945631-rmmsc4pee9in9m16o78hm6laov9dqdnn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "in.apps.Quibix",
+            "certificate_hash": "59cd15968051cf5663b0d55816771e81dbc8765b"
+          }
+        },
         {
           "client_id": "469326945631-mktis72t2scsk9kbrmruuiokv8ujscdc.apps.googleusercontent.com",
           "client_type": 3

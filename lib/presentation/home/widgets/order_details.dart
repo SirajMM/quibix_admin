@@ -1,25 +1,49 @@
 // ignore_for_file: must_be_immutable
-
+import 'package:admin/application/orders/order_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
 import 'order_details_tile.dart';
 import 'order_status.dart';
+import 'package:intl/intl.dart';
 
-class OrderDetails extends StatelessWidget {
-  OrderDetails({
+class OrderDetails extends StatefulWidget {
+  const OrderDetails({
     super.key,
+    required this.data,
   });
+  final QueryDocumentSnapshot<Map<String, dynamic>> data;
 
+  @override
+  State<OrderDetails> createState() => _OrderDetailsState();
+}
+
+class _OrderDetailsState extends State<OrderDetails> {
   List<String> nameList = <String>[
     'Placed',
     'Shipped',
     'Out of Delivery',
     'Delivered'
   ];
+  late DocumentSnapshot<Object?> data;
+  @override
+  void initState() {
+    Provider.of<OrderProvider>(context, listen: false)
+        .getProductData(widget.data['cartList'])
+        .listen((DocumentSnapshot data) {
+      setState(() {
+        this.data = data;
+      });
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    String dropdownNameValue = nameList.first;
+    String dropdownNameValue = widget.data['status'];
+    Timestamp timestamp = widget.data['orderDate'];
+    DateTime dateTime = timestamp.toDate();
+    String formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime);
     return Scaffold(
         body: SafeArea(
       child: SingleChildScrollView(
@@ -29,10 +53,10 @@ class OrderDetails extends StatelessWidget {
               height: 110,
               title: '${'User\n'}${'Kochi\n'}${'Alappatt (H)'}',
               maintitle: 'Adress'),
-          const DetailsTile(title: '24-06-2020', maintitle: 'Ordered on'),
+          DetailsTile(title: formattedDate, maintitle: 'Ordered on'),
           const DetailsTile(title: 'RazorPay', maintitle: 'Payment Method'),
-          const DetailsTile(title: 'Tv', maintitle: 'Products'),
-          const OrderDetailsActive(),
+          DetailsTile(title: data['category'], maintitle: 'Category'),
+          OrderDetailsActive(data: data, orderData: widget.data),
           StatefulBuilder(
             builder: (context, setState) => DropdownButtonHideUnderline(
               child: Container(
@@ -53,7 +77,18 @@ class OrderDetails extends StatelessWidget {
                     onChanged: (String? value) {
                       setState(
                         () {
+                          final orderRef = FirebaseFirestore.instance
+                              .collection('orders')
+                              .doc(widget.data['orderid']);
                           dropdownNameValue = value!;
+                          if (dropdownNameValue == 'Delivered') {
+                            orderRef.update({
+                              'status': dropdownNameValue,
+                              'isActive': false
+                            });
+                          } else {
+                            orderRef.update({'status': dropdownNameValue});
+                          }
                         },
                       );
                     },

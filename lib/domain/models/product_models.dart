@@ -4,7 +4,7 @@ class Products {
   final String category;
   final String quantity;
   final String price;
-  final String color;
+  final List<String>? color;
   final String description;
   final List? imageList;
   final String? id;
@@ -15,7 +15,7 @@ class Products {
     required this.category,
     required this.quantity,
     required this.price,
-    required this.color,
+    this.color,
     required this.description,
     this.imageList,
     this.id,

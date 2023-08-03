@@ -40,14 +40,9 @@ class ScreenHome extends StatelessWidget {
                       ),
                       GestureDetector(
                         onTap: () {
-                     
-                          Auth().signOut1();
+                          signOutShowDialog(context);
                         },
-                        child: const CircleAvatar(
-                          radius: 20,
-                          backgroundColor: Colors.grey,
-                          child: Icon(Icons.logout),
-                        ),
+                        child: const Icon(Icons.logout),
                       ),
                     ],
                   ),
@@ -63,22 +58,10 @@ class ScreenHome extends StatelessWidget {
               bottom: const TabBar(
                 tabs: [
                   Tab(
-                    child: Text(
-                      'Products',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
+                    child: TabbarHeding(text: 'Products'),
                   ),
                   Tab(
-                    child: Text(
-                      'Orders',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
+                    child: TabbarHeding(text: 'Orders'),
                   ),
                 ],
                 unselectedLabelColor: Colors.grey,
@@ -92,9 +75,18 @@ class ScreenHome extends StatelessWidget {
                 ),
               ),
             ),
-            body: TabBarView(
+            body: const TabBarView(
               children: <Widget>[
-                const ProductsTiles(),
+                Column(
+                  children: [
+                    Expanded(
+                      child: ProductsTiles(),
+                    ),
+                    SizedBox(
+                      height: 80,
+                    ),
+                  ],
+                ),
                 OrdersTiles(),
               ],
             ),
@@ -136,6 +128,57 @@ class ScreenHome extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Future<dynamic> signOutShowDialog(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Sign Out ?'),
+          content: const Text('Are you sure you want to sign out ?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: kTextBlackColor),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Auth().signOut1();
+              },
+              child: const Text(
+                'Confirm',
+                style: TextStyle(color: kTextBlackColor),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class TabbarHeding extends StatelessWidget {
+  const TabbarHeding({
+    super.key,
+    required this.text,
+  });
+  final String text;
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: const TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: 18,
       ),
     );
   }

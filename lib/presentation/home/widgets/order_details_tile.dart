@@ -27,7 +27,7 @@ class DetailsTile extends StatelessWidget {
             height: 10,
           ),
           Container(
-            color: Colors.grey.withOpacity(.5),
+            color: Colors.grey.withOpacity(.2),
             width: size.width,
             height: height ?? 50,
             child: Padding(
