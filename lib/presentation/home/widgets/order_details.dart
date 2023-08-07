@@ -25,14 +25,24 @@ class _OrderDetailsState extends State<OrderDetails> {
     'Out of Delivery',
     'Delivered'
   ];
-  late DocumentSnapshot<Object?> data;
+  DocumentSnapshot<Object?>? data;
+  DocumentSnapshot<Object?>? address;
   @override
   void initState() {
-    Provider.of<OrderProvider>(context, listen: false)
+    final orderProvider = Provider.of<OrderProvider>(context, listen: false);
+    orderProvider
         .getProductData(widget.data['cartList'])
         .listen((DocumentSnapshot data) {
       setState(() {
         this.data = data;
+      });
+    });
+
+    orderProvider
+        .getAddressData(widget.data['addressId'], widget.data['userEmail'])
+        .listen((DocumentSnapshot data) {
+      setState(() {
+        address = data;
       });
     });
     super.initState();
@@ -48,15 +58,16 @@ class _OrderDetailsState extends State<OrderDetails> {
         body: SafeArea(
       child: SingleChildScrollView(
         child: Column(children: [
-          const DetailsTile(title: 'user@gmail.com', maintitle: 'Email'),
-          const DetailsTile(
+          DetailsTile(title: widget.data['userEmail'], maintitle: 'E-mail'),
+          DetailsTile(
               height: 110,
-              title: '${'User\n'}${'Kochi\n'}${'Alappatt (H)'}',
+              title:
+                  '${address!['name']}\n${address!['permanent adress']}(H)\n${address!['city']}\n${address!['country code']} ${address!['phoneNumber']}',
               maintitle: 'Adress'),
           DetailsTile(title: formattedDate, maintitle: 'Ordered on'),
           const DetailsTile(title: 'RazorPay', maintitle: 'Payment Method'),
-          DetailsTile(title: data['category'], maintitle: 'Category'),
-          OrderDetailsActive(data: data, orderData: widget.data),
+          DetailsTile(title: data!['category'], maintitle: 'Category'),
+          OrderDetailsActive(data: data!, orderData: widget.data),
           StatefulBuilder(
             builder: (context, setState) => DropdownButtonHideUnderline(
               child: Container(
@@ -77,10 +88,10 @@ class _OrderDetailsState extends State<OrderDetails> {
                     onChanged: (String? value) {
                       setState(
                         () {
+                          dropdownNameValue = value!;
                           final orderRef = FirebaseFirestore.instance
                               .collection('orders')
                               .doc(widget.data['orderid']);
-                          dropdownNameValue = value!;
                           if (dropdownNameValue == 'Delivered') {
                             orderRef.update({
                               'status': dropdownNameValue,

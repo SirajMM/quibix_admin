@@ -17,7 +17,8 @@ Future<void> addProduct(Products products, BuildContext context) async {
       'color': products.color,
       'id': reference.id,
       'imageList': products.imageList,
-      'description': products.description
+      'description': products.description,
+      'searchField': products.productName.toLowerCase().trim(),
     }).then(
       (value) => Navigator.pop(context),
     );

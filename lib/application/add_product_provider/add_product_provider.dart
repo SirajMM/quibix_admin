@@ -14,12 +14,12 @@ class AddProductProvider extends ChangeNotifier {
   List<String> get imageModels => _imageModels;
   String? get errorMessage => _errorMessage;
 
-
   void deletePickedImage(int index) {
-    imageModels.isNotEmpty ? imageModels.removeAt(index) : null; 
+    imageModels.isNotEmpty ? imageModels.removeAt(index) : null;
     notifyListeners();
   }
-    void editeScreenDeletePickedImage(List imageList,int index) {
+
+  void editeScreenDeletePickedImage(List imageList, int index) {
     imageList.isNotEmpty ? imageList.removeAt(index) : null;
     notifyListeners();
   }
@@ -84,6 +84,7 @@ class AddProductProvider extends ChangeNotifier {
       'color': products.color,
       'description': products.description,
       'imageList': _imageModels,
+      'searchField': products.productName.toLowerCase().trim()
     });
     notifyListeners();
   }

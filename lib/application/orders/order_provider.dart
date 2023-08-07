@@ -7,4 +7,13 @@ class OrderProvider extends ChangeNotifier {
     final orderDoc = orderRef.doc(id);
     return orderDoc.snapshots();
   }
+
+  Stream<DocumentSnapshot> getAddressData(String id, String userEmail) {
+    final addressRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(userEmail)
+        .collection('address');
+    final addressDoc = addressRef.doc(id);
+    return addressDoc.snapshots();
+  }
 }
